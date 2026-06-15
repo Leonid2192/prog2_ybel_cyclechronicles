@@ -43,19 +43,22 @@ public class Shop {
    * @return finished order
    */
   public Optional<Order> repair() {
-    throw new UnsupportedOperationException();
+      Order oldestOrder = pendingOrders.poll();
+
+      if (oldestOrder == null) {
+          return Optional.empty();
+      }
+
+      completedOrders.add(oldestOrder);
+      return Optional.of(oldestOrder);
   }
 
-  /**
-   * Deliver a repaired bike to a customer.
-   *
-   * <p>Implementation note: Find any order in {@code completedOrders} with matching customer and
-   * deliver this order. Will remove the order from {@code completedOrders}.
-   *
-   * @param c search for any completed orders of this customer
-   * @return any finished order for given customer, {@code Optional.empty()} if none found
-   */
-  public Optional<Order> deliver(String c) {
-    throw new UnsupportedOperationException();
-  }
+    public Optional<Order> deliver(String c) {
+        Optional<Order> customerOrder = completedOrders.stream()
+            .filter(order -> order.getCustomer().equals(c))
+            .findFirst();
+
+        customerOrder.ifPresent(completedOrders::remove);
+        return customerOrder;
+    }
 }
